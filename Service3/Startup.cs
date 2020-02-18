@@ -60,19 +60,13 @@ namespace Service3
                 configurator.Send<Command2>(configTopology => { });
                 configurator.Send<Command3>(configTopology => { });
 
-                configurator.SubscriptionEndpoint<Event1>(TypeName<Event1>(),
-                    endpointConfigurator => { endpointConfigurator.Consumer<Event1Consumer>(); });
-                configurator.SubscriptionEndpoint<Event2>(TypeName<Event2>(),
-                    endpointConfigurator => { endpointConfigurator.Consumer<Event2Consumer>(); });
-                configurator.SubscriptionEndpoint<Event3>(TypeName<Event3>(),
-                    endpointConfigurator => { endpointConfigurator.Consumer<Event3Consumer>(); });
+                configurator.SubscriptionEndpoint<Event1>(TypeName<Event1>(), endpointConfigurator => { endpointConfigurator.Consumer<Event1Consumer>(); });
+                configurator.SubscriptionEndpoint<Event2>(TypeName<Event2>(), endpointConfigurator => { endpointConfigurator.Consumer<Event2Consumer>(); });
+                configurator.SubscriptionEndpoint<Event3>(TypeName<Event3>(), endpointConfigurator => { endpointConfigurator.Consumer<Event3Consumer>(); });
 
-                configurator.ReceiveEndpoint(TypeName<Command1>(),
-                    endpointConfigurator => { endpointConfigurator.Consumer<Command1Consumer>(); });
-                configurator.ReceiveEndpoint(TypeName<Command2>(),
-                    endpointConfigurator => { endpointConfigurator.Consumer<Command2Consumer>(); });
-                configurator.ReceiveEndpoint(TypeName<Command3>(),
-                    endpointConfigurator => { endpointConfigurator.Consumer<Command3Consumer>(); });
+                configurator.ReceiveEndpoint(TypeName<Command1>(), endpointConfigurator => { endpointConfigurator.Consumer<Command1Consumer>(); });
+                configurator.ReceiveEndpoint(TypeName<Command2>(), endpointConfigurator => { endpointConfigurator.Consumer<Command2Consumer>(); });
+                configurator.ReceiveEndpoint(TypeName<Command3>(), endpointConfigurator => { endpointConfigurator.Consumer<Command3Consumer>(); });
 
                 var host = configurator.Host(connectionString);
             });

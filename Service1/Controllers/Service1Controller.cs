@@ -11,7 +11,7 @@ namespace Service1.Controllers
     {
         private IPublishEndpoint PublishEndpoint { get; }
 
-        public Service1Controller(IPublishEndpoint publishEndpoint)
+        public Service1Controller(IBusControl publishEndpoint)
         {
             PublishEndpoint = publishEndpoint;
         }
