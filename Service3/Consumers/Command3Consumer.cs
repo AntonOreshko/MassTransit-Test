@@ -9,7 +9,7 @@ namespace Service3.Consumers
     {
         public async Task Consume(ConsumeContext<Command1> context)
         {
-            Console.WriteLine($"<Service1> received <{context.Message.Value}>");
+            Console.WriteLine($"<Service3> received <{context.Message.Value}>");
         }
     }
 }

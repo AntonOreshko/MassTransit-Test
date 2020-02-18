@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Common.Messages;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Service1.Controllers
@@ -7,9 +9,18 @@ namespace Service1.Controllers
     [ApiController]
     public class Service1Controller : ControllerBase
     {
+        private IPublishEndpoint PublishEndpoint { get; }
+
+        public Service1Controller(IPublishEndpoint publishEndpoint)
+        {
+            PublishEndpoint = publishEndpoint;
+        }
+
         [HttpGet]
         public IActionResult Get()
         {
+            PublishEndpoint.Publish(new Event1());
+            
             return Ok();
         }
 
