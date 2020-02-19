@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Common.Messages;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Service2.Controllers
@@ -7,31 +9,38 @@ namespace Service2.Controllers
     [ApiController]
     public class Service2Controller : ControllerBase
     {
+        private IPublishEndpoint PublishEndpoint { get; }
+
+        public Service2Controller(IBusControl publishEndpoint)
+        {
+            PublishEndpoint = publishEndpoint;
+        }
+
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok();
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-        {
+            PublishEndpoint.Publish(new Event1());
+            
             return Ok();
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] string value)
+        public IActionResult Post()
         {
+            PublishEndpoint.Publish(new Event2());
+            
             return Ok();
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string value)
+        [HttpPut]
+        public IActionResult Put()
         {
+            PublishEndpoint.Publish(new Event3());
+            
             return Ok();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public IActionResult Delete(int id)
         {
             return Ok();

@@ -5,7 +5,7 @@ using MassTransit;
 
 namespace Service2.Consumers
 {
-    public class Event1Consumer: IConsumer<Event1>
+    public class S2Event1Consumer: IConsumer<Event1>
     {
         public async Task Consume(ConsumeContext<Event1> context)
         {

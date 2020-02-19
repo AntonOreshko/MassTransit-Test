@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Common.Constants;
 using Common.Messages;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +13,13 @@ namespace Service1.Controllers
     public class Service1Controller : ControllerBase
     {
         private IPublishEndpoint PublishEndpoint { get; }
+        
+        private ISendEndpointProvider SendEndpointProvider { get; }
 
-        public Service1Controller(IBusControl publishEndpoint)
+        public Service1Controller(IBusControl busControl)
         {
-            PublishEndpoint = publishEndpoint;
+            PublishEndpoint = busControl;
+            SendEndpointProvider = busControl;
         }
 
         [HttpGet]
@@ -24,27 +30,29 @@ namespace Service1.Controllers
             return Ok();
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-        {
-            return Ok();
-        }
-
         [HttpPost]
-        public IActionResult Post([FromBody] string value)
+        public IActionResult Post()
         {
+            PublishEndpoint.Publish(new Event2());
+            
             return Ok();
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string value)
+        [HttpPut]
+        public IActionResult Put()
         {
+            PublishEndpoint.Publish(new Event3());
+            
             return Ok();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete()
         {
+            var sendEndpoint = await SendEndpointProvider.GetSendEndpoint(new Uri(PathConstants.BUS_URL + PathConstants.COMMAND1));
+
+            await sendEndpoint.Send(new Command1());
+            
             return Ok();
         }
     }
