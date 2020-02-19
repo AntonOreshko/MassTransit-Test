@@ -1,18 +1,10 @@
-﻿using System;
-using Common.Constants;
-using Common.MassTransit;
+﻿using Common.MassTransit;
 using Common.Messages;
-using GreenPipes;
-using GreenPipes.Introspection;
-using MassTransit;
-using MassTransit.Azure.ServiceBus.Core;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Service1.Consumers;
 
 namespace Service1
@@ -29,67 +21,16 @@ namespace Service1
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddScoped<S1Event1Consumer>();
-            services.AddScoped<S1Event2Consumer>();
-            services.AddScoped<S1Event3Consumer>();
-
-            var azureServiceBus = Bus.Factory.CreateUsingAzureServiceBus(configurator =>
+            
+            services.ConfigureMassTransit( new[]
             {
-                configurator.Message<Event1>(x => x.SetEntityName(PathConstants.EVENT1));
-                configurator.Publish<Event1>(x => {});
-
-                configurator.SubscriptionEndpoint<Event1>(PathConstants.EVENT1, x =>
-                {
-                    x.Consumer<S1Event1Consumer>();
-                    x.Consumer<S1Event2Consumer>();
-                    x.Consumer<S1Event3Consumer>();
-                });
-                configurator.SubscriptionEndpoint<Event2>(PathConstants.EVENT2, x =>
-                {
-                    x.Consumer<S1Event1Consumer>();
-                    x.Consumer<S1Event2Consumer>();
-                    x.Consumer<S1Event3Consumer>();
-                });
-                configurator.SubscriptionEndpoint<Event3>(PathConstants.EVENT3, x =>
-                {
-                    x.Consumer<S1Event1Consumer>();
-                    x.Consumer<S1Event2Consumer>();
-                    x.Consumer<S1Event3Consumer>();
-                });
-                configurator.ReceiveEndpoint(PathConstants.COMMAND1, x =>
-                {
-                    x.Consumer<Command1Consumer>();
-                });
-                configurator.ReceiveEndpoint(PathConstants.COMMAND2, x =>
-                {
-                    x.Consumer<Command2Consumer>();
-                });
-                configurator.ReceiveEndpoint(PathConstants.COMMAND3, x =>
-                {
-                    x.Consumer<Command3Consumer>();
-                });
-
-                
-                configurator.Host(PathConstants.CONNECTION_STRING);
+                services.SubscribeToTopic<S1Event1Consumer, Event1>("service-1-event-1"),
+                services.SubscribeToTopic<S1Event2Consumer, Event2>("service-1-event-2"),
+                services.SubscribeToTopic<S1Event3Consumer, Event3>("service-1-event-3"),
+                services.DeclareQueue<Command1>()
             });
-            
-            azureServiceBus.Start();
-            
-            ProbeResult result = azureServiceBus.GetProbeResult();
-
-            Console.WriteLine(JsonConvert.SerializeObject(result));
-            
-            services.AddMassTransit(config =>
-            {
-                config.AddConsumer<S1Event1Consumer>();
-                config.AddConsumer<S1Event2Consumer>();
-                config.AddConsumer<S1Event3Consumer>();
-            });
-
-            services.AddSingleton(azureServiceBus);
         }
-
+        
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())

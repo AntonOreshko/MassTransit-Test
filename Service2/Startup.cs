@@ -30,33 +30,12 @@ namespace Service2
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddScoped<S2Event1Consumer>();
-            services.AddScoped<S2Event2Consumer>();
-            services.AddScoped<S2Event3Consumer>();
-
-            var azureServiceBus = Bus.Factory.CreateUsingAzureServiceBus(configurator =>
+            services.ConfigureMassTransit( new[]
             {
-                configurator.SubscriptionEndpoint<Event1>(PathConstants.EVENT1, x => { x.Consumer<S2Event1Consumer>(); });
-                configurator.SubscriptionEndpoint<Event2>(PathConstants.EVENT2, x => { x.Consumer<S2Event2Consumer>(); });
-                configurator.SubscriptionEndpoint<Event3>(PathConstants.EVENT3, x => { x.Consumer<S2Event3Consumer>(); });
-
-                configurator.Host(PathConstants.CONNECTION_STRING);
+                services.SubscribeToTopic<S2Event1Consumer, Event1>("service-2-event-1"),
+                services.SubscribeToTopic<S2Event2Consumer, Event2>("service-2-event-2"),
+                services.SubscribeToTopic<S2Event3Consumer, Event3>("service-2-event-3")
             });
-            
-            azureServiceBus.Start();
-            
-            ProbeResult result = azureServiceBus.GetProbeResult();
-
-            Console.WriteLine(JsonConvert.SerializeObject(result));
-
-            services.AddMassTransit(config =>
-            {
-                config.AddConsumer<S2Event1Consumer>();
-                config.AddConsumer<S2Event2Consumer>();
-                config.AddConsumer<S2Event3Consumer>();
-            });
-
-            services.AddSingleton(azureServiceBus);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

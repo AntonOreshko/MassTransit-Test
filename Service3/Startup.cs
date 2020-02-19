@@ -30,33 +30,13 @@ namespace Service3
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddScoped<S3Event1Consumer>();
-            services.AddScoped<S2Event2Consumer>();
-            services.AddScoped<S3Event3Consumer>();
-
-            var azureServiceBus = Bus.Factory.CreateUsingAzureServiceBus(configurator =>
+            services.ConfigureMassTransit( new[]
             {
-                configurator.SubscriptionEndpoint<Event1>(PathConstants.EVENT1, x => { x.Consumer<S3Event1Consumer>(); });
-                configurator.SubscriptionEndpoint<Event2>(PathConstants.EVENT2, x => { x.Consumer<S2Event2Consumer>(); });
-                configurator.SubscriptionEndpoint<Event3>(PathConstants.EVENT3, x => { x.Consumer<S3Event3Consumer>(); });
-
-                configurator.Host(PathConstants.CONNECTION_STRING);
+                services.SubscribeToTopic<S3Event1Consumer, Event1>("service-3-event-1"),
+                services.SubscribeToTopic<S3Event2Consumer, Event2>("service-3-event-2"),
+                services.SubscribeToTopic<S3Event3Consumer, Event3>("service-3-event-3"),
+                services.SubscribeToQueue<Command1Consumer, Command1>()
             });
-            
-            azureServiceBus.Start();
-            
-            ProbeResult result = azureServiceBus.GetProbeResult();
-
-            Console.WriteLine(JsonConvert.SerializeObject(result));
-
-            services.AddMassTransit(config =>
-            {
-                config.AddConsumer<S3Event1Consumer>();
-                config.AddConsumer<S2Event2Consumer>();
-                config.AddConsumer<S3Event3Consumer>();
-            });
-
-            services.AddSingleton(azureServiceBus);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

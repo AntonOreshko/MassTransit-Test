@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Constants;
+using Common.MassTransit;
 using Common.Messages;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +50,7 @@ namespace Service1.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete()
         {
-            var sendEndpoint = await SendEndpointProvider.GetSendEndpoint(new Uri(PathConstants.BUS_URL + PathConstants.COMMAND1));
+            var sendEndpoint = await SendEndpointProvider.GetSendEndpoint(new Uri(PathConstants.BUS_URL + new object().TypeName<Command1>()));
 
             await sendEndpoint.Send(new Command1());
             

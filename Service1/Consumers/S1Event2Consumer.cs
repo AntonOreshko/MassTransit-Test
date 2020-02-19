@@ -5,21 +5,11 @@ using MassTransit;
 
 namespace Service1.Consumers
 {
-    public class S1Event2Consumer: IConsumer<Event1>, IConsumer<Event2>, IConsumer<Event3>
+    public class S1Event2Consumer: IConsumer<Event2>
     {
-        public async Task Consume(ConsumeContext<Event1> context)
-        {
-            Console.WriteLine($"<Service1> S2 received <{context.Message.Value}>");
-        }
-
         public async Task Consume(ConsumeContext<Event2> context)
         {
-            Console.WriteLine($"<Service1> S2 received <{context.Message.Value}>");
-        }
-
-        public async Task Consume(ConsumeContext<Event3> context)
-        {
-            Console.WriteLine($"<Service1> S2 received <{context.Message.Value}>");
+            Console.WriteLine($"<Service1> received <{context.Message.Value}>");
         }
     }
 }
