@@ -1,18 +1,10 @@
-﻿using System;
-using Common.Constants;
-using Common.MassTransit;
+﻿using Common.MassTransit;
 using Common.Messages;
-using GreenPipes;
-using GreenPipes.Introspection;
-using MassTransit;
-using MassTransit.Azure.ServiceBus.Core;
-using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Service3.Consumers;
 
 namespace Service3
@@ -36,7 +28,7 @@ namespace Service3
                 services.SubscribeToTopic<S3Event2Consumer, Event2>("service-3-event-2"),
                 services.SubscribeToTopic<S3Event3Consumer, Event3>("service-3-event-3"),
                 services.SubscribeToQueue<Command1Consumer, Command1>()
-            });
+            }, Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

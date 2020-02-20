@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Common.Constants;
-using Common.MassTransit;
+﻿using Common.MassTransit.Services;
 using Common.Messages;
-using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Service1.Controllers
@@ -13,47 +8,38 @@ namespace Service1.Controllers
     [ApiController]
     public class Service1Controller : ControllerBase
     {
-        private IPublishEndpoint PublishEndpoint { get; }
+        private readonly IMassTransitService _massTransitService;
         
-        private ISendEndpointProvider SendEndpointProvider { get; }
-
-        public Service1Controller(IBusControl busControl)
+        public Service1Controller(IMassTransitService massTransitService)
         {
-            PublishEndpoint = busControl;
-            SendEndpointProvider = busControl;
+            _massTransitService = massTransitService;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            PublishEndpoint.Publish(new Event1());
-            
+            _massTransitService.PublishMessage(new Event1());
             return Ok();
         }
 
         [HttpPost]
         public IActionResult Post()
         {
-            PublishEndpoint.Publish(new Event2());
-            
+            _massTransitService.PublishMessage(new Event2());
             return Ok();
         }
 
         [HttpPut]
         public IActionResult Put()
         {
-            PublishEndpoint.Publish(new Event3());
-            
+            _massTransitService.PublishMessage(new Event3());
             return Ok();
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete()
+        public IActionResult Delete()
         {
-            var sendEndpoint = await SendEndpointProvider.GetSendEndpoint(new Uri(PathConstants.BUS_URL + new object().TypeName<Command1>()));
-
-            await sendEndpoint.Send(new Command1());
-            
+            _massTransitService.SendMessage(new Command1());
             return Ok();
         }
     }

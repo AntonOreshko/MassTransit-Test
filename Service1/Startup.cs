@@ -22,13 +22,16 @@ namespace Service1
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             
+            var section = Configuration.GetSection("MassTransitSettings");
+            services.Configure<MassTransitSettings>(section);
+            
             services.ConfigureMassTransit( new[]
             {
                 services.SubscribeToTopic<S1Event1Consumer, Event1>("service-1-event-1"),
                 services.SubscribeToTopic<S1Event2Consumer, Event2>("service-1-event-2"),
                 services.SubscribeToTopic<S1Event3Consumer, Event3>("service-1-event-3"),
                 services.DeclareQueue<Command1>()
-            });
+            }, Configuration);
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

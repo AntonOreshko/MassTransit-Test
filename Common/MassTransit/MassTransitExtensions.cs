@@ -1,17 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using Common.Constants;
+using Common.MassTransit.Services;
 using MassTransit;
 using MassTransit.Azure.ServiceBus.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace Common.MassTransit
 {
     public static class MassTransitExtensions
     {
-        public static void ConfigureMassTransit(this IServiceCollection services, Action<IServiceBusBusFactoryConfigurator>[] configurators)
+        public static void ConfigureMassTransit(this IServiceCollection services, Action<IServiceBusBusFactoryConfigurator>[] configurators, IConfiguration configuration)
         {
+            var settings = new MassTransitSettings();
+            var section = configuration.GetSection("MassTransitSettings");
+            section.Bind(settings);
+            
             var azureServiceBus = Bus.Factory.CreateUsingAzureServiceBus(internalConfigurator =>
             {
                 configurators.ToList().ForEach(configurator =>
@@ -19,24 +23,16 @@ namespace Common.MassTransit
                     configurator(internalConfigurator);
                 });
                 
-                internalConfigurator.Host(PathConstants.CONNECTION_STRING);
+                internalConfigurator.Host(settings.AzureServiceBusConnectionString);
             });
             
             azureServiceBus.Start();
             
             services.AddSingleton(azureServiceBus);
+
+            services.AddScoped<IMassTransitService, MassTransitService>();
         }
 
-        public static Action<IServiceBusBusFactoryConfigurator> DeclareTopic<TMessage>(this object obj, string topicName = null)
-            where TMessage: class
-        {
-            return configurator =>
-            {
-                if (string.IsNullOrEmpty(topicName)) topicName = TypeName<TMessage>();
-                configurator.Message<TMessage>(x => x.SetEntityName(topicName));
-            };
-        }
-        
         public static Action<IServiceBusBusFactoryConfigurator> DeclareQueue<TMessage>(this object obj, string queueName = null)
             where TMessage : class
         {
