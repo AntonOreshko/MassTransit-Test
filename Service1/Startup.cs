@@ -22,9 +22,6 @@ namespace Service1
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             
-            var section = Configuration.GetSection("MassTransitSettings");
-            services.Configure<MassTransitSettings>(section);
-            
             services.ConfigureMassTransit( new[]
             {
                 this.AddTopicSubscription<S1Event1Consumer, Event1>("service-1-event-1"),

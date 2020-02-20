@@ -15,6 +15,7 @@ namespace Common.MassTransit
             var settings = new MassTransitSettings();
             var section = configuration.GetSection("MassTransitSettings");
             section.Bind(settings);
+            services.Configure<MassTransitSettings>(section);
             
             var azureServiceBus = Bus.Factory.CreateUsingAzureServiceBus(internalConfigurator =>
             {
