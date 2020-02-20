@@ -27,11 +27,16 @@ namespace Service1
             
             services.ConfigureMassTransit( new[]
             {
-                services.SubscribeToTopic<S1Event1Consumer, Event1>("service-1-event-1"),
-                services.SubscribeToTopic<S1Event2Consumer, Event2>("service-1-event-2"),
-                services.SubscribeToTopic<S1Event3Consumer, Event3>("service-1-event-3"),
-                services.DeclareQueue<Command1>()
+                this.AddTopicSubscription<S1Event1Consumer, Event1>("service-1-event-1"),
+                this.AddTopicSubscription<S1Event2Consumer, Event2>("service-1-event-2"),
+                this.AddTopicSubscription<S1Event3Consumer, Event3>("service-1-event-3"),
+                this.DeclareQueue<Command1>(),
+                this.DeclareQueue<Request1>(),
+                this.DeclareQueue<Request2>()
             }, Configuration);
+
+            services.AddRequestClient<Request1, Response1>(Configuration);
+            services.AddRequestClient<Request2, Response2>(Configuration);
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

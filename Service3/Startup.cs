@@ -24,10 +24,11 @@ namespace Service3
 
             services.ConfigureMassTransit( new[]
             {
-                services.SubscribeToTopic<S3Event1Consumer, Event1>("service-3-event-1"),
-                services.SubscribeToTopic<S3Event2Consumer, Event2>("service-3-event-2"),
-                services.SubscribeToTopic<S3Event3Consumer, Event3>("service-3-event-3"),
-                services.SubscribeToQueue<Command1Consumer, Command1>()
+                this.AddTopicSubscription<S3Event1Consumer, Event1>("service-3-event-1"),
+                this.AddTopicSubscription<S3Event2Consumer, Event2>("service-3-event-2"),
+                this.AddTopicSubscription<S3Event3Consumer, Event3>("service-3-event-3"),
+                this.AddQueueSubscription<Command1Consumer, Command1>(),
+                this.AddQueueSubscription<Request2Consumer, Request2>()
             }, Configuration);
         }
 

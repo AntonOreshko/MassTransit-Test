@@ -43,7 +43,7 @@ namespace Common.MassTransit
             };
         }
 
-        public static Action<IServiceBusBusFactoryConfigurator> SubscribeToTopic<TConsumer, TMessage>(this object obj, string subscriptionName, string topicName = null)
+        public static Action<IServiceBusBusFactoryConfigurator> AddTopicSubscription<TConsumer, TMessage>(this object obj, string subscriptionName, string topicName = null)
             where TConsumer: class, IConsumer<TMessage>, new()
             where TMessage : class
         {
@@ -55,18 +55,37 @@ namespace Common.MassTransit
             };
         }
 
-        public static Action<IServiceBusBusFactoryConfigurator> SubscribeToQueue<TConsumer, TMessage>(this object obj, string queueName = null)
+        public static Action<IServiceBusBusFactoryConfigurator> AddQueueSubscription<TConsumer, TMessage>(this object obj, string queueName = null)
             where TConsumer: class, IConsumer<TMessage>, new()
             where TMessage : class
         {
             return configurator =>
             {
                 if (string.IsNullOrEmpty(queueName)) queueName = TypeName<TMessage>();
-                //configurator.Message<TMessage>(x => x.SetEntityName(queueName));
                 configurator.ReceiveEndpoint(queueName, x => x.Consumer<TConsumer>());
             };
         }
 
+        public static void AddRequestClient<TRequest, TResponse>(this IServiceCollection services, IConfiguration configuration)
+            where TRequest : class 
+            where TResponse : class
+        {
+            var settings = new MassTransitSettings();
+            var section = configuration.GetSection("MassTransitSettings");
+            section.Bind(settings);
+
+            services.AddScoped<IRequestClient<TRequest, TResponse>>
+            (
+                x => new MessageRequestClient<TRequest, TResponse>
+                (
+                    x.GetRequiredService<IBusControl>(), 
+                    new Uri(settings.AzureServiceBusUrl + TypeName<TRequest>()), 
+                    TimeSpan.FromSeconds(settings.RequestTimeout), 
+                    TimeSpan.FromSeconds(settings.RequestTimeToLive)
+                )
+            );
+        }
+        
         public static string TypeName<T>(this object obj)
         {
             return typeof(T).FullName;
@@ -76,6 +95,5 @@ namespace Common.MassTransit
         {
             return typeof(T).FullName;
         }
-        
     }
 }
