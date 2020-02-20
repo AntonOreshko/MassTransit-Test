@@ -34,7 +34,7 @@ namespace Common.MassTransit
             services.AddScoped<IMassTransitService, MassTransitService>();
         }
 
-        public static Action<IServiceBusBusFactoryConfigurator> DeclareQueue<TMessage>(this object obj, string queueName = null)
+        public static Action<IServiceBusBusFactoryConfigurator> DeclareCommand<TMessage>(this object obj, string queueName = null)
             where TMessage : class
         {
             return configurator =>
@@ -44,7 +44,7 @@ namespace Common.MassTransit
             };
         }
 
-        public static Action<IServiceBusBusFactoryConfigurator> AddTopicSubscription<TConsumer, TMessage>(this object obj, string subscriptionName, string topicName = null)
+        public static Action<IServiceBusBusFactoryConfigurator> AddEventSubscription<TConsumer, TMessage>(this object obj, string subscriptionName, string topicName = null)
             where TConsumer: class, IConsumer<TMessage>, new()
             where TMessage : class
         {
@@ -56,7 +56,7 @@ namespace Common.MassTransit
             };
         }
 
-        public static Action<IServiceBusBusFactoryConfigurator> AddQueueSubscription<TConsumer, TMessage>(this object obj, string queueName = null)
+        public static Action<IServiceBusBusFactoryConfigurator> AddCommandSubscription<TConsumer, TMessage>(this object obj, string queueName = null)
             where TConsumer: class, IConsumer<TMessage>, new()
             where TMessage : class
         {
@@ -67,7 +67,7 @@ namespace Common.MassTransit
             };
         }
 
-        public static void AddRequestClient<TRequest, TResponse>(this IServiceCollection services, IConfiguration configuration)
+        public static void AddCommandRequestClient<TRequest, TResponse>(this IServiceCollection services, IConfiguration configuration)
             where TRequest : class 
             where TResponse : class
         {

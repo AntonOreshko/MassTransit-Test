@@ -24,10 +24,10 @@ namespace Service2
 
             services.ConfigureMassTransit( new[]
             {
-                this.AddTopicSubscription<S2Event1Consumer, Event1>("service-2-event-1"),
-                this.AddTopicSubscription<S2Event2Consumer, Event2>("service-2-event-2"),
-                this.AddTopicSubscription<S2Event3Consumer, Event3>("service-2-event-3"),
-                this.AddQueueSubscription<Request1Consumer, Request1>()
+                this.AddEventSubscription<S2Event1Consumer, Event1>("service-2-event-1"),
+                this.AddEventSubscription<S2Event2Consumer, Event2>("service-2-event-2"),
+                this.AddEventSubscription<S2Event3Consumer, Event3>("service-2-event-3"),
+                this.AddCommandSubscription<Request1Consumer, Request1>()
             }, Configuration);
         }
 
